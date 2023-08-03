@@ -13,7 +13,10 @@ import ahocorasick
 import pickle
 import os
 from spell_checker import SpellChecker
+import spacy
+from spacy.tokens import Doc
 
+from rasa_sdk import Action, Tracker
 
 # TODO: Correctly register your component with its type
 @DefaultV1Recipe.register(
@@ -21,7 +24,7 @@ from spell_checker import SpellChecker
 )
 class CustomNLUComponent(GraphComponent):
     def __init__(self) -> None:
-        super().__init__()
+        super().__init__()  
         # self.load_model()
         # self.ar_alphabet = "ءآأؤإئابةتثجحخدذرزسشصضطظعغفقكلمنهوىـ"
         # self.model_file = f"./data_ext/spell_ar_07.pickle"
@@ -34,8 +37,7 @@ class CustomNLUComponent(GraphComponent):
         return training_data
 
     def process(self, messages: List[Message]) -> List[Message]:
-        # TODO: This is the method which Rasa Open Source will call during inference.
-        """Processes incoming messages and computes and sets features."""
+        nlp = spacy.load("en_core_web_md")
         spell_checker = SpellChecker()
         for message in messages:
             logging.info(
@@ -43,8 +45,22 @@ class CustomNLUComponent(GraphComponent):
             )
             msg_text = message.data["text"]
 
-            edited_text = spell_checker.spell_check(msg_text, 0)
-            logging.info(f"############### after: {edited_text} ############### ")
-            message.data["text"] = edited_text
+            # Check for named entities (addressed as "GPE" in SpaCy)
+            doc = nlp(msg_text)
+            named_entities = [ent.text for ent in doc.ents if ent.label_ == "GPE"]
+
+            # Spell check and correct the text
+            corrected_text = spell_checker.spell_check(msg_text, 0)
+
+            # Response if it detect location 
+            if named_entities:
+                response = f"Here are the extracted locations: {', '.join(named_entities)}"
+            else:
+                response = "No locations were extracted from the input."
+
+            logging.info(response)
+            logging.info(f"############### after: {corrected_text} ############### ")
+
+            message.data["text"] = corrected_text
 
         return messages
