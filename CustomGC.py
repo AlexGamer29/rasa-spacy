@@ -12,10 +12,10 @@ from datetime import datetime
 import ahocorasick
 import pickle
 import os
-from spell_checker import SpellChecker
+# from spell_checker import SpellChecker
 import spacy
 from spacy.tokens import Doc
-
+from spellchecker import SpellChecker
 from rasa_sdk import Action, Tracker
 
 # TODO: Correctly register your component with its type
@@ -38,20 +38,26 @@ class CustomNLUComponent(GraphComponent):
 
     def process(self, messages: List[Message]) -> List[Message]:
         nlp = spacy.load("en_core_web_md")
-        spell_checker = SpellChecker()
+        spell = SpellChecker()
         for message in messages:
             logging.info(
                 f"############### before: {message.data['text']} ############### "
             )
             msg_text = message.data["text"]
-
             # Check for named entities (addressed as "GPE" in SpaCy)
             doc = nlp(msg_text)
             named_entities = [ent.text for ent in doc.ents if ent.label_ == "GPE"]
 
             # Spell check and correct the text
-            corrected_text = spell_checker.spell_check(msg_text, 0)
+            # corrected_text = spell_checker.spell_check(msg_text, 0)
+            words = msg_text.split()
+            # corrected_text = self.auto_correct_spelling(msg_text)
+            corrected_words = [spell.correction(word) for word in words]
+            corrected_text = ' '.join(corrected_words)
 
+
+            # proper_nouns = [token.text for token in doc if token.pos_ == "PROPN"]
+            person_names = [entity.text for entity in doc.ents if entity.label_ == "PERSON"]
             # Response if it detect location 
             if named_entities:
                 response = f"Here are the extracted locations: {', '.join(named_entities)}"
@@ -59,6 +65,8 @@ class CustomNLUComponent(GraphComponent):
                 response = "No locations were extracted from the input."
 
             logging.info(response)
+            logging.info(person_names)
+
             logging.info(f"############### after: {corrected_text} ############### ")
 
             message.data["text"] = corrected_text

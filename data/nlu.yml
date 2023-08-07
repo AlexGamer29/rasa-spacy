@@ -96,3 +96,20 @@ nlu:
       - كيف حالك
       - مرحبا؟
       - السلام عليكم
+
+  - intent: book_flight
+    examples: |
+      - I want to book a flight to New York.
+      - Book a flight from London to Paris.
+      - {2}(number) tickets to San Francisco, please.
+      - Can you help me book a flight to Tokyo?
+      - I need to reserve a flight to Berlin.
+      - How do I book a flight to Sydney?
+      - Book a flight for me.
+
+  - intent: get_flight_details
+    examples: |
+      - When is the flight?
+      - What time does the flight depart?
+      - Can you tell me the date and time of the flight?
+      - When does the plane take off?

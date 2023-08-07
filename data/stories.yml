@@ -27,3 +27,14 @@ stories:
       - action: utter_did_that_help
       - intent: deny
       - action: utter_goodbye
+
+  - story: book_flight
+    steps:
+      - intent: book_flight
+        entities:
+          - city: "New York"
+          - city: "London"
+          - city: "Paris"
+          - city: "San Francisco"
+          - number: 2
+      - action: action_book_flight

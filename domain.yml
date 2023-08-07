@@ -9,7 +9,11 @@ intents:
   - mood_unhappy
   - bot_challenge
   - arabic_challenge
+  - book_flight
 
+entities:
+  - city
+  - number
 responses:
   utter_greet:
     - text: "Hey! How are you?"
@@ -33,6 +37,8 @@ responses:
   utter_arabic:
     - text: "انا لا اتحدث العربية"
 
+actions:
+  - action_book_flight
 session_config:
   session_expiration_time: 60
   carry_over_slots_to_new_session: true

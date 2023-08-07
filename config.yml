@@ -42,7 +42,17 @@ pipeline:
   - name: "EntitySynonymMapper"
   - name: "SklearnIntentClassifier"
   - name: "CRFEntityExtractor"
-  - name: "CountVectorsFeaturizer"
+  # - name: WhitespaceTokenizer
+  - name: LexicalSyntacticFeaturizer
+  - name: CountVectorsFeaturizer
+  - name: CountVectorsFeaturizer
+    analyzer: char_wb
+    min_ngram: 1
+    max_ngram: 4
+  - name: DIETClassifier
+    epochs: 100
+  - name: ResponseSelector
+    epochs: 100
   # - name: "EmbeddingIntentClassifier"
 # Configuration for Rasa Core.
 # https://rasa.com/docs/rasa/core/policies/
